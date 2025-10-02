@@ -1,1 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>World Clock Assignment</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        table { width: 70%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+        th { background-color: #f0f0f0; }
+    </style>
+</head>
+<body>
+
+    <h1>Time Display for 9 Cities (Assignment Static Offsets)</h1>
+    
+    <table id="timeTable">
+        <thead>
+            <tr>
+                <th>City</th>
+                <th>Static UTC Offset</th>
+                <th>Calculated Current Time</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <script>
+        const ASSIGNMENT_OFFSETS_MINUTES = {
+            "UTC": 0,
+            "San Francisco": -7 * 60,
+            "New York": -4 * 60,
+            "London": 1 * 60,
+            "Dubai": 4 * 60,
+            "Bangalore": (5 * 60) + 30,
+            "Singapore": 8 * 60,
+            "Tokyo": 9 * 60,
+            "Sydney": 10 * 60,
+            "Wellington": 12 * 60
+        };
+
+        const tableBody = document.getElementById('timeTable').querySelector('tbody');
+
+        function formatOffset(totalMinutes) {
+            const sign = totalMinutes >= 0 ? "+" : "";
+            const absMins = Math.abs(totalMinutes);
+            const hours = Math.floor(absMins / 60);
+            const mins = absMins % 60;
+            return "UTC " + sign + hours + ":" + String(mins).padStart(2, '0');
+        }
+
+        function displayClock() {
+            const currentUtcMillis = Date.now();
+            
+            tableBody.innerHTML = '';
+
+            for (const city in ASSIGNMENT_OFFSETS_MINUTES) {
+                const offsetMins = ASSIGNMENT_OFFSETS_MINUTES[city];
+                
+                const offsetMillis = offsetMins * 60 * 1000;
+                
+                const cityTimeMillis = currentUtcMillis + offsetMillis;
+                const cityDate = new Date(cityTimeMillis);
+
+                const timeString = cityDate.toLocaleTimeString('en-US', { 
+                    year: 'numeric', month: '2-digit', day: '2-digit',
+                    hour: '2-digit', minute: '2-digit', second: '2-digit', 
+                    hour12: false, timeZone: 'UTC' 
+                }).replace(/(\d{2})\/(\d{2})\/(\d{4}),/, '$3-$1-$2'); 
+
+                const row = tableBody.insertRow();
+                row.insertCell().textContent = city;
+                row.insertCell().textContent = formatOffset(offsetMins);
+                row.insertCell().textContent = timeString;
+            }
+        }
+
+        displayClock();
+        setInterval(displayClock, 1000); 
+    </script>
+
+</body>
+</html>
 
